@@ -11,7 +11,7 @@ Setup:
 	TL;DR:  
 	You need to make one video with double of original height where top part is the original video and lower part is black-and-white alpha channel.  
 2. Save this code as ".html" file.  
-3. Specify path to your video in the "<source>" tag.  
+3. Specify path to your video in the `<source>` tag.  
 4. Set HIDDEN_TIME variable to the time in milliseconds you want video to remain hidden.  
 5. After that add new browser source in OBS, specify this html as local file  
 	and make sure to set up width and length to fit your video.  
