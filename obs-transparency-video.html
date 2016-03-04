@@ -1,0 +1,111 @@
+<!--
+Simple script for showning and hiding video on a page.
+Shows video by fading in, plays it, fades out, waits some time and repeats.
+Created by chimera (chimera.alv@gmail.com).
+
+Requres CLR Browser Plugin to use with OBS.
+Uses jQuery, so requires internet connection to start.
+
+Setup:
+1. Prepare your video as descriibed on this page http://www.sciencelifeny.com/transparency/transparency.html
+	"Directions", Steps 1-5.
+	TL;DR:
+	You need to make one video with double of original height where top part is the original video
+	and lower part is black-and-white alpha channel.
+2. Save this code as ".html" file.
+3. Specify path to your video in the "<source>" tag.
+4. Set HIDDEN_TIME variable to the time in milliseconds you want video to remain hidden.
+5. After that add new browser source in OBS, specify this html as local file
+	and make sure to set up width and length to fit your video.
+6. Done! The video will be replaying over and over.
+NOTE: If you want to change settings like HIDDEN_TIME varible or video path
+	you have to delete and add browser source again after you save changes.
+	
+-->
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+</head>
+<body>
+
+	<div id="appearing_div">		
+		<video id="video" style="display:none">
+		
+			<!--Specify path to your video here-->
+			<source src="compressed_stacked.webm" type='video/webm; codecs="vorbis,vp8"'>
+			
+		</video>		
+		<canvas width="640" height="720" id="buffer" style="display:none"></canvas>		
+		<canvas width="640" height="360" id="output"></canvas>  
+	</div>
+	
+	<script>
+
+		//change this variables to your liking (they are time in milliseconds)
+		var HIDDEN_TIME = 10000;
+		var FADE_TIME = 600;
+	
+		$(document).ready(function() {
+			$('#video').on('loadedmetadata', function() {
+				calcTransparency();
+				appear();
+			});
+		});
+		
+		function appear() {			
+			$('#appearing_div').fadeIn("slow");
+			var video = $("#video").get(0);
+			var videoDuration = video.duration;
+			video.play();
+			//video.muted = true;
+			setTimeout(disappear, videoDuration * 1000 - FADE_TIME);
+		};
+		
+		function disappear() {
+			$('#appearing_div').fadeOut(FADE_TIME);
+			setTimeout(appear, HIDDEN_TIME);
+		};
+		
+		//transparency function from http://www.sciencelifeny.com/transparency/transparency.html
+		function calcTransparency() {
+			var outputCanvas = document.getElementById('output'),
+			output = outputCanvas.getContext('2d'),
+			bufferCanvas = document.getElementById('buffer'),
+			buffer = bufferCanvas.getContext('2d'),
+			video = document.getElementById('video'),
+			width = outputCanvas.width,
+			height = outputCanvas.height,
+			interval;
+		 
+			function processFrame() {
+				video.crossOrigin = "Anonymous";
+				buffer.drawImage(video, 0, 0);
+				buffer.crossOrigin = "Anonymous";
+			 
+				// this can be done without alphaData, except in Firefox which doesn't like it when image is bigger than the canvas
+				var image = buffer.getImageData(0, 0, width, height),
+				imageData = image.data,
+				alphaData = buffer.getImageData(0, height, width, height).data;
+			 
+				for (var i = 3, len = imageData.length; i < len; i = i + 4) {
+					imageData[i] = alphaData[i-1];
+				}
+			 
+				output.putImageData(image, 0, 0, 0, 0, width, height);
+			}
+			
+			video.addEventListener('pause', function() {
+				clearInterval(interval);
+			}, false);
+			
+			video.addEventListener('play', function() {
+				clearInterval(interval);
+				interval = setInterval(processFrame, 40)
+			}, false);
+			
+		}
+		
+	</script>
+
+</body>
+</html>
