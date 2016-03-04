@@ -13,11 +13,12 @@ Setup:
 	You need to make one video with double of original height where top part is the original video
 	and lower part is black-and-white alpha channel.
 2. Save this code as ".html" file.
-3. Specify path to your video in the "<source>" tag.
-4. Set HIDDEN_TIME variable to the time in milliseconds you want video to remain hidden.
-5. After that add new browser source in OBS, specify this html as local file
+3. Specify path to your video in the `<source>` tag.
+4. Specify height and width of your video in `<canvas>` properties. Height is doubled for the first one.
+5. Set HIDDEN_TIME variable to the time in milliseconds you want video to remain hidden.
+6. After that add new browser source in OBS, specify this html as local file
 	and make sure to set up width and length to fit your video.
-6. Done! The video will be replaying over and over.
+7. Done! The video will be replaying over and over.
 NOTE: If you want to change settings like HIDDEN_TIME varible or video path
 	you have to delete and add browser source again after you save changes.
 	
@@ -34,8 +35,11 @@ NOTE: If you want to change settings like HIDDEN_TIME varible or video path
 			<!--Specify path to your video here-->
 			<source src="compressed_stacked.webm" type='video/webm; codecs="vorbis,vp8"'>
 			
-		</video>		
+		</video>
+		
+		<!--Specify proper width and double height here-->
 		<canvas width="640" height="720" id="buffer" style="display:none"></canvas>		
+		<!--Specify proper width and height here-->
 		<canvas width="640" height="360" id="output"></canvas>  
 	</div>
 	
